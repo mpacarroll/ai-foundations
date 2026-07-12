@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompt Helper — AI for Everyone</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body { font: 17px/1.5 system-ui, sans-serif; max-width: 640px; margin: 0 auto;
+         padding: 24px; }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  p.sub { margin-top: 0; opacity: 0.8; }
+  label { display: block; margin: 16px 0 4px; font-weight: 600; }
+  .hint { font-weight: 400; opacity: 0.7; font-size: 0.9rem; }
+  input, textarea { width: 100%; padding: 10px; font: inherit; border-radius: 8px;
+                    border: 1px solid rgba(128,128,128,0.5); background: transparent;
+                    color: inherit; }
+  textarea { min-height: 68px; resize: vertical; }
+  .row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+  .row input[type=checkbox] { width: auto; }
+  button { margin-top: 20px; padding: 12px 18px; font: inherit; font-weight: 600;
+           border: 0; border-radius: 8px; cursor: pointer; }
+  #out { white-space: pre-wrap; padding: 16px; margin-top: 16px; border-radius: 8px;
+         border: 1px dashed rgba(128,128,128,0.6); min-height: 40px; }
+  #copy { display: none; }
+  footer { margin-top: 28px; font-size: 0.9rem; opacity: 0.75; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+  <h1>Prompt Helper</h1>
+  <p class="sub">Answer a few plain questions. Get a good prompt to paste into any AI.
+     Nothing you type here leaves your device.</p>
+
+  <label for="task">What do you want the AI to do? <span class="hint">(the only required part)</span></label>
+  <textarea id="task" placeholder="e.g. help me write a birthday message for my mom"></textarea>
+
+  <label for="role">Who should the AI act as? <span class="hint">(optional)</span></label>
+  <input id="role" placeholder="e.g. a warm, funny writer">
+
+  <label for="audience">Who is it for? <span class="hint">(optional)</span></label>
+  <input id="audience" placeholder="e.g. my mom, who loves gardening">
+
+  <label for="format">How should the answer look? <span class="hint">(optional)</span></label>
+  <input id="format" placeholder="e.g. three short options">
+
+  <div class="row">
+    <input type="checkbox" id="askFirst" checked>
+    <label for="askFirst" style="margin:0;font-weight:400">
+      Let the AI ask me questions first (recommended)</label>
+  </div>
+
+  <button id="make">Make my prompt</button>
+  <div id="out" aria-live="polite"></div>
+  <button id="copy">Copy it</button>
+
+  <footer>
+    New to this? Read <a href="../guides/start-here.md">Start Here</a>.
+    Made by Mick. <a href="../README.md">Who's Mick? →</a>
+  </footer>
+
+<script>
+// This mirrors the tested tool/prompt_helper.js (kept inline so this page is one
+// self-contained file you can email to someone). Change both together.
+function buildPrompt(fields) {
+  const f = fields || {};
+  const task = (f.task || "").trim();
+  if (!task) throw new Error("A task is required — tell the AI what you want it to do.");
+  const lines = [];
+  if ((f.role || "").trim()) lines.push("You are " + f.role.trim() + ".");
+  lines.push("Your task: " + task);
+  if ((f.audience || "").trim()) lines.push("Audience: " + f.audience.trim());
+  if ((f.format || "").trim()) lines.push("Format the answer as: " + f.format.trim());
+  if (f.askFirst !== false)
+    lines.push("If anything is unclear, ask me any questions you need before you start.");
+  return lines.join("\n");
+}
+
+const $ = (id) => document.getElementById(id);
+const out = $("out"), copyBtn = $("copy");
+
+$("make").addEventListener("click", () => {
+  try {
+    out.textContent = buildPrompt({
+      task: $("task").value, role: $("role").value,
+      audience: $("audience").value, format: $("format").value,
+      askFirst: $("askFirst").checked,
+    });
+    copyBtn.style.display = "inline-block";
+  } catch (e) {
+    out.textContent = e.message;
+    copyBtn.style.display = "none";
+  }
+});
+
+copyBtn.addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(out.textContent); copyBtn.textContent = "Copied"; }
+  catch { copyBtn.textContent = "Select the text above to copy"; }
+  setTimeout(() => (copyBtn.textContent = "Copy it"), 1500);
+});
+</script>
+</body>
+</html>
