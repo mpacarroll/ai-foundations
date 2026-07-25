@@ -18,4 +18,4 @@ Next time you want it to write something, do not ask for "a" version. Ask for *t
 Ask it for five facts about a topic you know well. Look each one up. Mark them true, false, or misleading. **You are learning:** the single most important habit — verify facts, trust it for drafts. You stay in charge.
 
 ---
-Liked these? The other twenty-five are in *The AI Practice Book* ([find it on the Mick hub](https://mpacarroll.github.io/mick/#books)). Same voice, more reps.
+Liked these? The other twenty-five are in *The AI Practice Book* ([find it on the Mick hub](https://mpacarroll.github.io/ai-mick/#books)). Same voice, more reps.

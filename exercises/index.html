@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five First Exercises — Mick's Fair Dinkum AI</title>
+<meta name="description" content="Five short, real AI exercises you can do today with any assistant. Free, no sign-up.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230f5a34'/><text x='16' y='24' font-family='Georgia,serif' font-size='22' font-weight='700' fill='%23c99a2e' text-anchor='middle'>M</text></svg>">
+<style>
+  :root{--green:#0f5a34;--green-deep:#0a3d24;--gold:#a9780a;--gold-bright:#c99a2e;
+    --paper:#faf8f0;--card:#fff;--ink:#182219;--muted:#586459;--line:#e4dfce;
+    --serif:"Iowan Old Style",Palatino,Georgia,serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    color-scheme:light dark}
+  @media(prefers-color-scheme:dark){:root{--green:#3fa06a;--green-deep:#0c3b23;--gold:#d7b552;
+    --gold-bright:#e6c766;--paper:#141c16;--card:#1a241d;--ink:#e9efe9;--muted:#9aab9e;--line:#2a362d}}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6}
+  .band{height:10px;background:linear-gradient(90deg,var(--green),var(--gold-bright),var(--green))}
+  .wrap{max-width:660px;margin:0 auto;padding:0 20px 60px}
+  header{padding:40px 0 6px}
+  h1{font-family:var(--serif);font-size:clamp(1.9rem,5vw,2.5rem);margin:.1em 0;color:var(--green-deep)}
+  @media(prefers-color-scheme:dark){h1{color:#d7e6db}}
+  .lede{color:var(--muted);font-size:1.1rem}
+  .ex{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:12px;padding:18px 20px;margin:16px 0}
+  .ex h2{font-family:var(--serif);font-size:1.2rem;margin:0 0 8px;color:var(--green)}
+  .ex .n{color:var(--gold);font-weight:700}
+  .ex p{margin:0 0 8px}
+  .say{background:var(--paper);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;
+    font-style:italic;margin:8px 0}
+  .learn{font-size:.94rem;color:var(--muted)}
+  .learn b{color:var(--ink)}
+  .mc-cta{margin:34px 0 8px;padding:20px 22px;background:var(--card);border:1px solid var(--line);
+    border-left:3px solid var(--gold);border-radius:12px}
+  .mc-cta h3{font-family:var(--serif);font-size:1.15rem;margin:0 0 4px;color:var(--green)}
+  .mc-cta p{margin:0 0 12px;color:var(--muted);font-size:.94rem}
+  .mc-form{display:flex;gap:8px;flex-wrap:wrap;margin:0}
+  .mc-form input[type=email]{flex:1;min-width:200px;padding:11px;border:1.5px solid var(--line);
+    border-radius:9px;background:var(--paper);color:var(--ink);font:inherit}
+  .mc-form button{background:var(--green);color:#fff;border:none;padding:11px 18px;border-radius:9px;
+    font:inherit;font-weight:600;cursor:pointer}
+  @media(prefers-color-scheme:dark){.mc-form button{color:#08130c}}
+  .mc-hp{position:absolute;left:-9999px;width:1px;height:1px}
+  .mc-msg{width:100%;margin:8px 0 0;font-size:.9rem;font-weight:600;color:var(--green)}
+  footer{color:var(--muted);font-size:.85rem;padding-top:26px;border-top:1px solid var(--line);margin-top:32px}
+  footer a{color:var(--green)}
+</style>
+</head>
+<body>
+<div class="band"></div>
+<div class="wrap">
+  <header>
+    <h1>Five First Exercises</h1>
+    <p class="lede">Short, real, and doable today. Each takes a few minutes. Do them with any AI assistant open in front of you.</p>
+  </header>
+
+  <div class="ex">
+    <h2><span class="n">1.</span> The rewrite</h2>
+    <p>Take the longest message or email you sent this week. Paste it in and say:</p>
+    <div class="say">Cut this to half the length without losing anything that matters.</div>
+    <p>Read both. Notice what it kept.</p>
+    <p class="learn"><b>You are learning:</b> AI is a fast editor, and shorter is usually better.</p>
+  </div>
+
+  <div class="ex">
+    <h2><span class="n">2.</span> The explainer</h2>
+    <p>Ask it to explain something you already understand deeply — your job, a hobby, how to cook something you make often. Grade the answer in your head.</p>
+    <p class="learn"><b>You are learning:</b> where it is sharp and where it is vague, so you know when to trust it.</p>
+  </div>
+
+  <div class="ex">
+    <h2><span class="n">3.</span> The interviewer</h2>
+    <p>Pick a decision you are chewing on. Say:</p>
+    <div class="say">Interview me about this decision. Ask one question at a time. Do not give advice yet.</div>
+    <p>Answer honestly for a few rounds.</p>
+    <p class="learn"><b>You are learning:</b> AI is often more useful asking than answering.</p>
+  </div>
+
+  <div class="ex">
+    <h2><span class="n">4.</span> The three-options trick</h2>
+    <p>Next time you want it to write something, do not ask for "a" version. Ask for three:</p>
+    <div class="say">Give me three versions in different tones and let me pick.</div>
+    <p class="learn"><b>You are learning:</b> options beat a single guess, every time.</p>
+  </div>
+
+  <div class="ex">
+    <h2><span class="n">5.</span> The honesty check</h2>
+    <p>Ask it for five facts about a topic you know well. Look each one up. Mark them true, false, or misleading.</p>
+    <p class="learn"><b>You are learning:</b> the single most important habit — verify facts, trust it for drafts. You stay in charge.</p>
+  </div>
+
+  <section class="mc-cta">
+    <h3>Want the other twenty-five?</h3>
+    <p>These five are a taste. The full thirty are in <i>The AI Practice Book</i>. Join the list and I'll tell you the moment it's out, plus one useful thing a week.</p>
+    <form class="mc-form" data-source="five-exercises" novalidate>
+      <input type="email" name="email" placeholder="you@example.com" aria-label="Your email address" required>
+      <input type="text" name="website" class="mc-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="submit">Tell me when it's out</button>
+      <p class="mc-msg" role="status"></p>
+    </form>
+  </section>
+
+  <footer>
+    Made by Mick Cairn. Free tools, plain-language AI, no hype.
+    <a href="https://mpacarroll.github.io/ai-mick/">See everything &rarr;</a>
+  </footer>
+</div>
+<script>
+(function(){
+  var f=document.querySelector('.mc-form'); if(!f) return;
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var msg=f.querySelector('.mc-msg'), btn=f.querySelector('button');
+    var email=(f.email.value||'').trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ msg.textContent='Please enter a valid email.'; return; }
+    if(f.website.value){ msg.textContent='Thanks — you’re on the list.'; return; }
+    btn.disabled=true; msg.textContent='Adding you…';
+    fetch('https://join.micksfairdinkumai.com/subscribe',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email,source:f.dataset.source})})
+      .then(function(r){return r.json().catch(function(){return {ok:r.ok};});})
+      .then(function(d){
+        if(d && d.ok){ msg.textContent='Thanks — you’re on the list.'; f.email.value=''; }
+        else { msg.textContent=(d && d.error)?d.error:'Something went wrong. Try again.'; btn.disabled=false; }
+      })
+      .catch(function(){ msg.textContent='Could not reach the server. Try again shortly.'; btn.disabled=false; });
+  });
+})();
+</script>
+</body>
+</html>
