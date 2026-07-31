@@ -1,6 +1,6 @@
 # Foundational AI
 
-The foundational AI skills that actually matter, in plain language, for people who feel behind. No jargon, no hype, no "you should already know this." If you can write an email, you can do everything here. Start here, then go further with [AI in Real Life](https://github.com/mpacarroll/ai-in-real-life) and [Become an AI Builder](https://github.com/mpacarroll/become-an-ai-builder).
+The foundational AI skills that actually matter, in plain language, for people who feel behind. No jargon, no hype, no "you should already know this." If you can write an email, you can do everything here. Start here, then go further with [AI in Real Life](https://github.com/mpacarroll/ai-for-real-life) and [Become an AI Builder](https://github.com/mpacarroll/ai-building-blocks).
 
 I'm Mick. I use AI every day and I build small tools that work. This repo is the approachable version of what I've learned: the few things that actually matter, explained for normal people. [Who's Mick? →](#whos-mick)
 
