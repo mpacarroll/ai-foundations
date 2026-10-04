@@ -19,5 +19,7 @@ The five exercises here are a taste. The full set of thirty lives in **The AI Pr
 ## Who's Mick
 I'm Mick. I use AI every day and build small tools that work — you're using one of the things I made. No hype, no course to sell you, on your side. [More about Mick →](https://mpacarroll.github.io/ai-mick/#about)
 
+Not affiliated with any employer.
+
 ## License
 MIT — see [LICENSE](LICENSE). Use it, share it, remix it.
