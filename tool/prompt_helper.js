@@ -5,7 +5,7 @@ function buildPrompt(fields) {
   const f = fields || {};
   const task = (f.task || "").trim();
   if (!task) {
-    throw new Error("A task is required — tell the AI what you want it to do.");
+    throw new Error("A task is required. Tell the AI what you want it to do.");
   }
   const lines = [];
   if ((f.role || "").trim()) {
