@@ -3,85 +3,168 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prompt Helper — AI for Everyone</title>
+<title>Prompt Helper: AI for Everyone</title>
 <link rel="canonical" href="https://mpacarroll.github.io/ai-foundations/tool/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Mick's Fair Dinkum AI">
-<meta property="og:title" content="Prompt Helper — AI for Everyone">
+<meta property="og:title" content="Prompt Helper: AI for Everyone">
 <meta property="og:description" content="">
 <meta property="og:url" content="https://mpacarroll.github.io/ai-foundations/tool/">
 <meta property="og:image" content="https://mpacarroll.github.io/ai-foundations/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Prompt Helper — AI for Everyone">
+<meta name="twitter:title" content="Prompt Helper: AI for Everyone">
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="https://mpacarroll.github.io/ai-foundations/assets/og-image.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Prompt Helper \u2014 AI for Everyone", "description": "", "url": "https://mpacarroll.github.io/ai-foundations/tool/"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Prompt Helper: AI for Everyone", "description": "", "url": "https://mpacarroll.github.io/ai-foundations/tool/"}</script>
 
 <style>
-  :root { color-scheme: light dark; }
-  * { box-sizing: border-box; }
-  body { font: 17px/1.5 system-ui, sans-serif; max-width: 640px; margin: 0 auto;
-         padding: 24px; }
-  h1 { font-size: 1.6rem; margin-bottom: 4px; }
-  p.sub { margin-top: 0; opacity: 0.8; }
-  label { display: block; margin: 16px 0 4px; font-weight: 600; }
-  .hint { font-weight: 400; opacity: 0.7; font-size: 0.9rem; }
-  input, textarea { width: 100%; padding: 10px; font: inherit; border-radius: 8px;
-                    border: 1px solid rgba(128,128,128,0.5); background: transparent;
-                    color: inherit; }
-  textarea { min-height: 68px; resize: vertical; }
-  .row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
-  .row input[type=checkbox] { width: auto; }
-  button { margin-top: 20px; padding: 12px 18px; font: inherit; font-weight: 600;
-           border: 0; border-radius: 8px; cursor: pointer; }
-  #out { white-space: pre-wrap; padding: 16px; margin-top: 16px; border-radius: 8px;
-         border: 1px dashed rgba(128,128,128,0.6); min-height: 40px; }
-  #copy { display: none; }
-  footer { margin-top: 28px; font-size: 0.9rem; opacity: 0.75; }
-  a { color: inherit; }
+  /* Mick Cairn house look (2026-10-07 mockup, approved 2026-10-08): charcoal and cairn stone carry the page,
+     green is the accent, ochre is the tartan's second thread. Fonts are self-hosted in ../assets/fonts. */
+  @font-face{font-family:"Young Serif";src:url("../assets/fonts/young-serif-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:"Atkinson Hyperlegible";src:url("../assets/fonts/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:"Atkinson Hyperlegible";src:url("../assets/fonts/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+  :root{
+    --char:#2b2e33; --ochre:#d08a2c; --green:#1d6b44; --green-deep:#14502f;
+    --stone:#e7e5e0; --sheet:#fbfaf7; --card:#ffffff; --ink:#1f2124; --muted:#5d5f63; --line:#d6d3cc;
+    --on-char:#efe6d2;
+    --display:"Young Serif",Georgia,"Times New Roman",serif;
+    --sans:"Atkinson Hyperlegible",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    color-scheme:light dark;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --ochre:#e09a3c; --green:#5bb585; --green-deep:#7cc9a0;
+    --stone:#121315; --sheet:#1b1d20; --card:#202327; --ink:#ecebe7; --muted:#a5a6a8; --line:#33363b;
+  }}
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;font-family:var(--sans);background:var(--sheet);color:var(--ink);line-height:1.55;font-size:17px;-webkit-font-smoothing:antialiased}
+  a{color:var(--green)}
+  :focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
 
-  /* --- funnel CTA (shared across tools) --- */
-  .mc-cta{margin:34px 0 8px;padding:20px 22px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px}
-  .mc-cta h3{font-family:var(--serif);font-size:1.15rem;margin:0 0 4px;color:var(--green)}
-  .mc-cta p{margin:0 0 12px;color:var(--muted);font-size:.94rem}
-  .mc-form{display:flex;gap:8px;flex-wrap:wrap;margin:0}
-  .mc-form input[type=email]{flex:1;min-width:200px;padding:11px;border:1.5px solid var(--line);border-radius:9px;background:var(--paper);color:var(--ink);font:inherit}
-  .mc-form button{background:var(--green);color:#fff;border:none;padding:11px 18px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}
-  .mc-form button:hover{background:var(--green-deep)}
+  /* the cloth: text sits on solid charcoal, the tartan is a selvedge band with nothing on it */
+  .mc-top{background:var(--char);color:var(--on-char)}
+  .mc-top::after{content:"";display:block;height:26px;background-color:var(--char);border-top:2px solid var(--ochre);
+    background-image:
+      repeating-linear-gradient(90deg,rgba(0,0,0,.32) 0 14px,transparent 14px 40px),
+      repeating-linear-gradient(0deg,rgba(0,0,0,.32) 0 14px,transparent 14px 40px),
+      repeating-linear-gradient(90deg,transparent 0 24px,rgba(208,138,44,.8) 24px 28px,transparent 28px 40px),
+      repeating-linear-gradient(0deg,transparent 0 24px,rgba(208,138,44,.8) 24px 28px,transparent 28px 40px),
+      repeating-linear-gradient(90deg,transparent 0 33px,rgba(46,140,92,.9) 33px 35px,transparent 35px 40px)}
+  .mc-bar{display:flex;align-items:center;gap:14px;min-height:64px}
+  .mc-mark{display:flex;align-items:center;gap:10px;color:var(--on-char);text-decoration:none;margin-right:auto}
+  .mc-mark svg{flex:none}
+  .mc-mark b{display:block;font-family:var(--display);font-weight:400;font-size:1.25rem;line-height:1.1}
+  .mc-mark small{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
+  .mc-all{color:var(--on-char);text-decoration:none;font-size:.92rem;opacity:.9}
+  .mc-all:hover{opacity:1;text-decoration:underline}
+
+  header.intro{padding:34px 0 4px}
+  h1{font-family:var(--display);font-weight:400;font-size:clamp(2rem,4.4vw,2.7rem);line-height:1.08;margin:0 0 .25em;color:var(--ink);text-wrap:balance}
+  h3{font-family:var(--display);font-weight:400}
+  .lede{color:var(--muted);max-width:64ch;margin:0}
+  .hint{font-weight:400;color:var(--muted);font-size:.86rem}
+
+  .tabs{display:flex;gap:2px;flex-wrap:wrap;margin:22px 0 0;border-bottom:1px solid var(--line)}
+  .tab{background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;color:var(--muted);padding:10px 14px;font:inherit;font-weight:700;font-size:.94rem;cursor:pointer}
+  .tab:hover{color:var(--ink)}
+  .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--green)}
+
+  /* a panel is the form, with its result beside it on wide screens and above it on a phone */
+  .panel{display:none;padding:20px 0 8px}
+  .panel.on{display:flex;flex-direction:column}
+  .panel>.out{order:-1;margin:0 0 18px}
+  .panel>.ex{order:-2;margin-bottom:12px}
+  .panel .btn{align-self:flex-start;justify-self:start}
+  @media (max-width:480px){.tab{padding:10px 9px;font-size:.88rem}}
+  @media (min-width:900px){
+    .panel.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);column-gap:36px;align-content:start}
+    .panel.on>*{grid-column:1}
+    .panel.on>.out{grid-column:2;grid-row:1 / span 40;margin:0;align-self:start}
+  }
+  .ex{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.88rem;color:var(--muted);margin:0 0 4px}
+  .ex .tag,.tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+  .ex .tag{background:color-mix(in srgb,var(--green) 14%,transparent);padding:3px 7px;border-radius:3px}
+  .ex button{background:none;border:0;padding:0;font:inherit;color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-color:var(--green);text-underline-offset:3px;cursor:pointer}
+
+  label{display:block;font-weight:700;margin:14px 0 5px;font-size:.95rem}
+  input,textarea,select{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:6px;background:var(--stone);color:var(--ink);font:inherit}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--green);outline-offset:1px;border-color:var(--green)}
+  textarea{min-height:84px;resize:vertical}
+  .btn{display:inline-block;background:var(--char);color:var(--on-char);border:0;border-bottom:3px solid var(--green);padding:12px 20px;border-radius:6px;font:inherit;font-weight:700;cursor:pointer;margin-top:18px;text-decoration:none}
+  .btn:hover{background:#1c1e22}
+  @media (prefers-color-scheme:dark){.btn{background:#3a3e44}.btn:hover{background:#464a51}}
+  .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);border-bottom-width:3px}
+
+  .out{display:none;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--green);border-radius:8px;padding:18px 20px;box-shadow:0 14px 34px -24px rgba(20,20,22,.5);min-width:0}
+  .out.on{display:block}
+  .out h3{font-size:1.25rem;margin:.1em 0 .5em}
+  pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--stone);border:1px solid var(--line);border-radius:6px;padding:12px 14px;font-family:var(--mono);font-size:.84rem;margin:0 0 10px}
+  .copy{background:var(--ochre);color:#1d1305;border:0;padding:9px 15px;border-radius:6px;font:inherit;font-weight:700;cursor:pointer}
+  ul.check{padding-left:0;list-style:none;margin:.4em 0 0}
+  ul.check li{padding:6px 0 6px 26px;position:relative}
+  ul.check li::before{content:"\2713";position:absolute;left:0;color:var(--green);font-weight:700}
+
+  /* funnel CTA, shared across tools */
+  .mc-cta{margin:40px 0 8px;padding:24px 0 0;border-top:1px solid var(--line)}
+  .mc-cta h3{font-size:1.25rem;margin:0 0 4px}
+  .mc-cta p{margin:0 0 12px;color:var(--muted);font-size:.95rem}
+  .mc-form{display:flex;gap:8px;flex-wrap:wrap;margin:0;max-width:520px}
+  .mc-form input[type=email]{flex:1;min-width:200px}
+  .mc-form button{background:var(--char);color:var(--on-char);border:0;border-bottom:3px solid var(--green);padding:10px 18px;border-radius:6px;font:inherit;font-weight:700;cursor:pointer}
+  @media (prefers-color-scheme:dark){.mc-form button{background:#3a3e44}}
   .mc-hp{position:absolute;left:-9999px;width:1px;height:1px}
-  .mc-msg{width:100%;margin:8px 0 0;font-size:.9rem;font-weight:600;color:var(--green)}
-  .mc-more{margin:12px 0 0;font-size:.9rem}
-  .mc-more a{color:var(--green);font-weight:600}
+  .mc-msg{width:100%;margin:8px 0 0;font-size:.9rem;font-weight:700;color:var(--green)}
+  .mc-more{margin:12px 0 0;font-size:.95rem}
+  .mc-more a{font-weight:700}
+  footer{color:var(--muted);font-size:.86rem;padding:28px 0 56px}
+
+  .row{display:flex;align-items:center;gap:8px;margin-top:16px}
+  .row input[type=checkbox]{width:auto;accent-color:var(--green)}
+  #out{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--mono);font-size:.86rem;background:var(--stone);border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin:0 0 10px;min-height:3em}
+  #out.err{font-family:var(--sans);font-size:.95rem;background:none;border:0;padding:0}
+
 </style>
 </head>
 <body>
-  <h1>Prompt Helper</h1>
-  <p class="sub">Answer a few plain questions. Get a good prompt to paste into any AI.
-     Nothing you type here leaves your device.</p>
-
-  <label for="task">What do you want the AI to do? <span class="hint">(the only required part)</span></label>
-  <textarea id="task" placeholder="e.g. help me write a birthday message for my mom"></textarea>
-
-  <label for="role">Who should the AI act as? <span class="hint">(optional)</span></label>
-  <input id="role" placeholder="e.g. a warm, funny writer">
-
-  <label for="audience">Who is it for? <span class="hint">(optional)</span></label>
-  <input id="audience" placeholder="e.g. my mom, who loves gardening">
-
-  <label for="format">How should the answer look? <span class="hint">(optional)</span></label>
-  <input id="format" placeholder="e.g. three short options">
-
-  <div class="row">
-    <input type="checkbox" id="askFirst" checked>
-    <label for="askFirst" style="margin:0;font-weight:400">
-      Let the AI ask me questions first (recommended)</label>
-  </div>
-
-  <button id="make">Make my prompt</button>
-  <div id="out" aria-live="polite"></div>
-  <button id="copy">Copy it</button>
+<header class="mc-top"><div class="wrap mc-bar">
+  <a class="mc-mark" href="https://mpacarroll.github.io/ai-mick/" aria-label="Mick Cairn, all free tools">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="26" rx="12" ry="4.2" fill="#d08a2c"/><ellipse cx="16" cy="18.6" rx="8.6" ry="3.8" fill="#cfc8b8"/><ellipse cx="15.4" cy="12" rx="5.6" ry="3.1" fill="#d08a2c"/><ellipse cx="16.2" cy="6.6" rx="3.2" ry="2.3" fill="#2e8c5c"/></svg>
+    <span><b>Mick Cairn</b><small>Free tools</small></span>
+  </a>
+  <a class="mc-all" href="https://mpacarroll.github.io/ai-mick/#tools">All tools</a>
+</div></header>
+<div class="wrap">
+  <header class="intro">
+    <h1>Prompt Helper</h1>
+    <p class="lede">Answer a few plain questions. Get a good prompt to paste into any AI.
+       Nothing you type here leaves your device.</p>
+  </header>
+  <section class="panel on" id="helper">
+    <p class="ex"><span class="tag">Example</span>Swap in your own and press Make. <button type="button" id="clear">Clear the example</button></p>
+    <label for="task">What do you want the AI to do? <span class="hint">(the only required part)</span></label>
+    <textarea id="task" placeholder="e.g. help me write a birthday message for my mom"></textarea>
+    <label for="role">Who should the AI act as? <span class="hint">(optional)</span></label>
+    <input id="role" placeholder="e.g. a warm, funny writer">
+    <label for="audience">Who is it for? <span class="hint">(optional)</span></label>
+    <input id="audience" placeholder="e.g. my mom, who loves gardening">
+    <label for="format">How should the answer look? <span class="hint">(optional)</span></label>
+    <input id="format" placeholder="e.g. three short options">
+    <div class="row">
+      <input type="checkbox" id="askFirst" checked>
+      <label for="askFirst" style="margin:0;font-weight:400">
+        Let the AI ask me questions first (recommended)</label>
+    </div>
+    <button id="make" class="btn">Make my prompt</button>
+    <div class="out on" id="result">
+      <h3>Paste this into any AI</h3>
+      <div id="out" aria-live="polite"></div>
+      <button id="copy" class="copy">Copy it</button>
+    </div>
+  </section>
 
 
   <section class="mc-cta">
@@ -97,8 +180,9 @@
   </section>
   <footer>
     New to this? Read <a href="../guides/start-here.md">Start Here</a>.
-    Made by Mick. <a href="../README.md">Who's Mick? →</a>
+    Made by Mick. <a href="../README.md">Who's Mick?</a>
   </footer>
+</div>
 
 <script>
 // This mirrors the tested tool/prompt_helper.js (kept inline so this page is one
@@ -106,7 +190,7 @@
 function buildPrompt(fields) {
   const f = fields || {};
   const task = (f.task || "").trim();
-  if (!task) throw new Error("A task is required — tell the AI what you want it to do.");
+  if (!task) throw new Error("A task is required. Tell the AI what you want it to do.");
   const lines = [];
   if ((f.role || "").trim()) lines.push("You are " + f.role.trim() + ".");
   lines.push("Your task: " + task);
@@ -120,20 +204,35 @@ function buildPrompt(fields) {
 const $ = (id) => document.getElementById(id);
 const out = $("out"), copyBtn = $("copy");
 
-$("make").addEventListener("click", () => {
+function make() {
   try {
     out.textContent = buildPrompt({
       task: $("task").value, role: $("role").value,
       audience: $("audience").value, format: $("format").value,
       askFirst: $("askFirst").checked,
     });
-    copyBtn.style.display = "inline-block";
+    out.classList.remove("err");
+    copyBtn.hidden = false;
   } catch (e) {
     out.textContent = e.message;
-    copyBtn.style.display = "none";
+    out.classList.add("err");
+    copyBtn.hidden = true;
   }
+}
+$("make").addEventListener("click", make);
+// Open on a worked example (the placeholders, filled in) so the first view shows the result.
+const EXAMPLE = { task: "help me write a birthday message for my mom", role: "a warm, funny writer",
+  audience: "my mom, who loves gardening", format: "three short options" };
+for (const k in EXAMPLE) $(k).value = EXAMPLE[k];
+make();
+$("clear").addEventListener("click", () => {
+  for (const k in EXAMPLE) $(k).value = "";
+  out.textContent = "Your prompt will appear here.";
+  out.classList.add("err");
+  copyBtn.hidden = true;
+  $("clear").closest(".ex").hidden = true;
+  $("task").focus();
 });
-
 copyBtn.addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(out.textContent); copyBtn.textContent = "Copied"; }
   catch { copyBtn.textContent = "Select the text above to copy"; }
@@ -149,13 +248,13 @@ copyBtn.addEventListener("click", async () => {
     var msg=f.querySelector('.mc-msg'), btn=f.querySelector('button');
     var email=(f.email.value||'').trim();
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ msg.textContent='Please enter a valid email.'; return; }
-    if(f.website.value){ msg.textContent='Thanks — you\u2019re on the list.'; return; }
+    if(f.website.value){ msg.textContent='Thanks, you\u2019re on the list.'; return; }
     btn.disabled=true; msg.textContent='Adding you\u2026';
     fetch('https://join.micksfairdinkumai.com/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({email:email,source:f.dataset.source})})
       .then(function(r){return r.json().catch(function(){return {ok:r.ok};});})
       .then(function(d){
-        if(d && d.ok){ msg.textContent='Thanks \u2014 you\u2019re on the list.'; f.email.value=''; }
+        if(d && d.ok){ msg.textContent='Thanks, you\u2019re on the list.'; f.email.value=''; }
         else { msg.textContent=(d && d.error) ? d.error : 'Something went wrong. Try again.'; btn.disabled=false; }
       })
       .catch(function(){ msg.textContent='Could not reach the server. Try again shortly.'; btn.disabled=false; });
