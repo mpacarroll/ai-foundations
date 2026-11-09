@@ -96,6 +96,7 @@
   function isEmptyInput(lab, input) {
     if (lab.type === "choice") return !input || !input.choice;
     if (lab.type === "flag") return false; // ticking nothing is a valid (if weak) answer
+    if (lab.type === "diagnose") return !input || !input.picks || !Object.values(input.picks).some(Boolean);
     return !normalize(inputText(input)).length;
   }
 
@@ -122,6 +123,31 @@
     };
   }
 
+  // Diagnose labs: one cause per case. Unanswered cases count as wrong, so skipping is never rewarded.
+  function gradeDiagnosis(lab, input, check) {
+    const picks = (input && input.picks) || {};
+    const cases = lab.attempt.cases;
+    const right = [], wrong = [], unanswered = [];
+    for (const c of cases) {
+      const p = picks[c.id];
+      if (!p) unanswered.push(c.id);
+      else if (p === c.cause) right.push(c.id);
+      else wrong.push({ id: c.id, picked: p, expected: c.cause });
+    }
+    const met = right.length === cases.length;
+    return {
+      fraction: cases.length ? right.length / cases.length : 0,
+      result: {
+        id: check.id,
+        label: check.label,
+        weight: check.weight || 1,
+        met,
+        message: met ? check.note : check.tip,
+        detail: { right, wrong, unanswered }
+      }
+    };
+  }
+
   function grade(lab, input) {
     if (!lab || !Array.isArray(lab.checks)) throw new Error("grade() needs a lab with checks.");
     if (isEmptyInput(lab, input)) {
@@ -131,7 +157,7 @@
         score: 0,
         passed: false,
         checks: [],
-        summary: lab.type === "choice" ? "Pick one of the options first." : "Type your attempt first, then check it."
+        summary: lab.type === "choice" ? "Pick one of the options first." : lab.type === "diagnose" ? "Pick a cause for at least one reply first." : "Type your attempt first, then check it."
       };
     }
     let earned = 0, total = 0;
@@ -139,8 +165,8 @@
     for (const check of lab.checks) {
       const weight = check.weight || 1;
       total += weight;
-      if (check.type === "flags") {
-        const r = gradeFlags(lab, input, check);
+      if (check.type === "flags" || check.type === "diagnosis") {
+        const r = check.type === "flags" ? gradeFlags(lab, input, check) : gradeDiagnosis(lab, input, check);
         earned += weight * r.fraction;
         checks.push(r.result);
         continue;

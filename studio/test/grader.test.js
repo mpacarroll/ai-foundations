@@ -4,7 +4,8 @@ const { COURSE, EVALUATION_LIMITS } = require("../course.js");
 const { grade, compareResults, hasTerm, changeRatio, normalize } = require("../grader.js");
 const SAMPLES = require("./fixtures.js");
 
-const lab = (id) => COURSE.labs.find((l) => l.id === id);
+const { findLab } = require("../catalog.js");
+const lab = (id) => findLab(id);
 
 test("course data is well formed", () => {
   const ids = new Set();
