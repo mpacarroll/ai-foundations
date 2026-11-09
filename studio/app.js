@@ -3,8 +3,15 @@
 (function () {
   "use strict";
   const S = window.AFStudio;
-  const COURSE = S.COURSE;
-  const LABS = COURSE.labs;
+  // The course on screen. Lab ids are unique across courses, so a lab link always finds its course.
+  let COURSE = S.COURSES[0];
+  let LABS = COURSE.labs;
+  function setCourse(c) {
+    if (!c || c === COURSE) return;
+    COURSE = c;
+    LABS = c.labs;
+    if (store.state.course !== c.id) store.setCourse(c.id);
+  }
 
   let storage = null;
   try { storage = window.localStorage; } catch (e) { storage = null; }
@@ -30,7 +37,7 @@
     return el;
   }
   const $ = (id) => document.getElementById(id);
-  const labById = (id) => LABS.find((l) => l.id === id);
+  const labById = (id) => S.findLab(id);
   const labIndex = (id) => LABS.findIndex((l) => l.id === id);
 
   function showNotice(msg) {
@@ -56,6 +63,7 @@
         h("span", {}, lab.title, h("span", { class: "meta" }, meta))));
     }));
     const passed = LABS.filter((l) => store.summary(l.id).status === "passed").length;
+    $("course-name").textContent = COURSE.title;
     $("progress-label").textContent = passed + " of " + LABS.length + " labs passed";
     $("progress-bar").style.width = Math.round((passed / LABS.length) * 100) + "%";
     const ws = store.state.workshop;
@@ -68,10 +76,30 @@
   }
 
   // ---------- overview ----------
+  function courseProgress(c) {
+    const passed = c.labs.filter((l) => store.summary(l.id).status === "passed").length;
+    const started = c.labs.some((l) => store.summary(l.id).attempts);
+    return { passed, started, total: c.labs.length };
+  }
+
+  function coursesCard() {
+    return h("section", { class: "card", "aria-label": "Courses" },
+      h("h3", {}, "Courses"),
+      h("div", { class: "courses" }, S.COURSES.map((c, i) => {
+        const p = courseProgress(c);
+        const mins = c.labs.reduce((t, l) => t + l.minutes, 0);
+        return h("a", { class: "course" + (c === COURSE ? " current" : ""), href: "#/course/" + c.id, "data-course": c.id, "aria-current": c === COURSE ? "true" : null },
+          h("span", { class: "small muted" }, "Course " + (i + 1) + ", " + c.labs.length + " labs, about " + mins + " minutes"),
+          h("b", {}, c.title),
+          h("span", { class: "small" }, p.passed === p.total ? "Finished" : p.started ? p.passed + " of " + p.total + " passed" : i > 0 ? "Best after Course 1" : "Start here"));
+      })));
+  }
+
   function renderHome() {
     const next = nextUnpassed();
     const started = LABS.some((l) => store.summary(l.id).attempts);
     show(
+      coursesCard(),
       h("section", { class: "card" },
         h("span", { class: "tag" }, "Beginner course"),
         h("h2", {}, COURSE.title),
@@ -167,6 +195,7 @@
     const list = store.attempts(lab.id);
     if (list.length) return list[list.length - 1].input;
     if (lab.type === "flag") return { flags: [] };
+    if (lab.type === "diagnose") return { picks: {} };
     if (lab.type === "choice") return { choice: "", why: "" };
     return { text: lab.attempt.starter || "" };
   }
@@ -200,11 +229,32 @@
           a.options.map((o, idx) => h("label", { class: "opt" }, radios[idx], h("span", {}, h("b", {}, o.id + ". "), o.text)))),
         h("label", { for: "why" }, "Why? One sentence is enough."), why);
       readInput = () => ({ choice: (radios.find((r) => r.checked) || {}).value || "", why: why.value });
+    } else if (lab.type === "diagnose") {
+      const picks = start.picks || {};
+      const selects = a.cases.map((c, idx) => h("select", { class: "cause", "aria-label": "Cause for reply " + (idx + 1), "data-case": c.id, onchange: queueDraft },
+        h("option", { value: "" }, "Pick the main cause"),
+        a.causes.map((k) => h("option", { value: k.id, selected: picks[c.id] === k.id ? true : null }, k.label))));
+      field = h("div", {},
+        h("details", { class: "causes", open: true }, h("summary", {}, "The five causes"),
+          h("ul", {}, a.causes.map((k) => h("li", {}, h("b", {}, k.label + ": "), k.hint)))),
+        a.cases.map((c, idx) => h("div", { class: "case" },
+          h("div", { class: "small muted" }, "Reply " + (idx + 1) + ". You typed:"),
+          h("pre", {}, c.prompt),
+          h("div", { class: "small muted" }, "It replied:"),
+          h("div", { class: "quote" }, c.reply),
+          selects[idx])));
+      readInput = () => {
+        const out = {};
+        for (const sel of selects) if (sel.value) out[sel.dataset.case] = sel.value;
+        return { picks: out };
+      };
     } else if (lab.type === "flag") {
       const picked = new Set(start.flags || []);
       const boxes = a.sentences.map((s) => h("input", { type: "checkbox", value: s.id, checked: picked.has(s.id) ? true : null, onchange: queueDraft }));
-      field = h("fieldset", {}, h("legend", { class: "lbl" }, "The AI's reply, one sentence per line"),
-        a.sentences.map((s, idx) => h("label", { class: "opt" }, boxes[idx], h("span", {}, s.text))));
+      field = h("div", {},
+        a.source ? h("div", { class: "source", "data-testid": "source" }, h("div", { class: "small muted" }, "The original:"), h("p", { style: "margin:4px 0 0" }, a.source)) : null,
+        h("fieldset", {}, h("legend", { class: "lbl" }, a.source ? "The AI's summary, one sentence per line" : "The AI's reply, one sentence per line"),
+          a.sentences.map((s, idx) => h("label", { class: "opt" }, boxes[idx], h("span", {}, s.text)))));
       readInput = () => ({ flags: boxes.filter((b) => b.checked).map((b) => b.value) });
     } else {
       const ta = h("textarea", { id: "attempt", placeholder: a.placeholder || "", oninput: queueDraft, spellcheck: "true" });
@@ -269,6 +319,20 @@
           h("span", { class: "explain" }, s.explain));
       })));
     }
+    if (lab.type === "diagnose") {
+      const picks = r.attempt.input.picks || {};
+      const causeLabel = (id) => (lab.attempt.causes.find((k) => k.id === id) || { label: "nothing" }).label;
+      parts.push(h("h3", {}, "Reply by reply"));
+      parts.push(h("div", {}, lab.attempt.cases.map((c, idx) => {
+        const p = picks[c.id];
+        const right = p === c.cause;
+        return h("div", { class: "sent" },
+          h("span", { class: "mark " + (right ? "ok" : "bad") }, right ? "RIGHT" : p ? "NOT QUITE" : "SKIPPED"),
+          h("span", {}, "Reply " + (idx + 1) + ": " + causeLabel(c.cause),
+            !right && p ? h("span", { class: "muted small" }, " (you picked: " + causeLabel(p) + ")") : null),
+          h("span", { class: "explain" }, c.explain));
+      })));
+    }
     if (lab.type === "choice") {
       const pick = r.attempt.input.choice;
       const shown = cur.passed ? lab.attempt.options : lab.attempt.options.filter((o) => o.id === pick);
@@ -302,6 +366,10 @@
   function describeInput(lab, input) {
     if (lab.type === "choice") return "Picked " + (input.choice || "nothing") + (input.why ? ": " + input.why : "");
     if (lab.type === "flag") return (input.flags || []).length + " sentences flagged";
+    if (lab.type === "diagnose") {
+      const n = Object.keys(input.picks || {}).length;
+      return n + " of " + lab.attempt.cases.length + " replies diagnosed";
+    }
     const t = input.text || "";
     return t.length > 120 ? t.slice(0, 117) + "..." : t;
   }
@@ -327,8 +395,9 @@
           nextUnpassed() ? h("a", { class: "btn", href: "#/lab/" + nextUnpassed().id + "/learn" }, "Continue") : null,
           h("button", { type: "button", class: "btn ghost", onclick: openProgress }, "Share with an instructor or save a copy"),
           h("button", { type: "button", class: "btn ghost", onclick: () => window.print() }, "Print"))),
-      h("section", { class: "card" }, h("h3", {}, "The six habits"),
-        h("ol", {}, LABS.map((l) => h("li", {}, l.learn.idea)))));
+      h("section", { class: "card" }, h("h3", {}, "The " + LABS.length + " habits in " + COURSE.title),
+        h("ol", {}, LABS.map((l) => h("li", {}, l.learn.idea)))),
+      coursesCard());
   }
 
   // ---------- workshop ----------
@@ -337,6 +406,13 @@
 
   function renderWorkshop() {
     if (!store.state.workshop) { store.setWorkshop(true); }
+    if (!LABS.some((l) => l.id === timer.labId)) {
+      clearInterval(timer.handle);
+      Object.assign(timer, { labId: LABS[0].id, remaining: LABS[0].facilitator.minutes * 60, running: false });
+    }
+    const coursePick = h("select", { id: "workshop-course", style: "padding:8px;border-radius:6px;border:1.5px solid var(--line);background:var(--stone);color:var(--ink);font:inherit;margin-bottom:8px;max-width:100%",
+      onchange: (e) => { setCourse(S.courseById(e.target.value)); route(); } },
+      S.COURSES.map((c) => h("option", { value: c.id, selected: c === COURSE ? true : null }, c.title)));
     const agenda = S.buildAgenda(COURSE);
     const clock = h("div", { class: "timer", "data-testid": "timer" });
     const paint = () => {
@@ -366,6 +442,7 @@
       h("section", { class: "card" },
         h("span", { class: "tag" }, "Workshop mode"),
         h("h2", {}, "Run this course with a group"),
+        h("label", { for: "workshop-course" }, "Course for this session"), coursePick,
         h("p", {}, "Project this page or keep it on your own screen. Learners work through the labs on their own devices, then send you their progress code from Save or move my progress. Codes carry scores only, never what anyone typed."),
         h("div", { class: "tablewrap" }, h("table", { class: "agenda" },
           h("thead", {}, h("tr", {}, h("th", {}, "Starts"), h("th", {}, "Minutes"), h("th", {}, "Segment"))),
@@ -411,6 +488,7 @@
       h("span", { class: "small muted" }, s.tried ? s.passed + " of " + s.tried + " passed, average best " + s.averageBest + "%" : "Nobody has tried this yet"),
       s.topMiss ? h("div", { class: "small" }, "Most missed: " + s.topMiss.label + " (" + s.topMiss.count + ")") : null))));
     out.push(h("div", { class: "tablewrap" }, h("table", { "data-testid": "board-table" },
+      h("caption", { class: "small muted", style: "text-align:left" }, COURSE.title),
       h("thead", {}, h("tr", {}, h("th", {}, "Learner"), LABS.map((l, i) => h("th", { title: l.title }, "Lab " + (i + 1))), h("th", {}, "Passed"))),
       h("tbody", {}, agg.rows.map((r) => h("tr", {}, h("td", {}, r.name),
         r.cells.map((c) => c ? h("td", { class: c.passed ? "pass" : "try" }, c.best + "%" + (c.attempts > 1 ? " (" + c.attempts + ")" : "")) : h("td", { class: "muted" }, "")),
@@ -431,7 +509,7 @@
   // ---------- dialogs ----------
   function openProgress() {
     $("learner-name").value = store.state.learner;
-    $("class-code").value = store.classCode(LABS.map((l) => l.id));
+    $("class-code").value = store.classCode(S.allLabIds());
     $("persist-line").textContent = store.persistent
       ? "Your progress saves automatically in this browser on this device."
       : "This browser is not allowing saves, so progress lasts only until you close the page. Download a progress file to keep it.";
@@ -451,7 +529,7 @@
     });
     $("learner-name").addEventListener("change", (e) => {
       store.setLearner(e.target.value);
-      $("class-code").value = store.classCode(LABS.map((l) => l.id));
+      $("class-code").value = store.classCode(S.allLabIds());
     });
     $("copy-code").addEventListener("click", async () => {
       const btn = $("copy-code");
@@ -502,9 +580,11 @@
     let active = null;
     if (parts[0] === "lab" && labById(parts[1])) {
       const lab = labById(parts[1]);
+      setCourse(S.courseOfLab(lab.id));
       active = lab.id;
       renderLab(lab, ["learn", "try", "feedback"].includes(parts[2]) ? parts[2] : "learn");
-    } else if (parts[0] === "done") renderDone();
+    } else if (parts[0] === "course" && S.courseById(parts[1])) { setCourse(S.courseById(parts[1])); renderHome(); }
+    else if (parts[0] === "done") renderDone();
     else if (parts[0] === "workshop") renderWorkshop();
     else renderHome();
     renderNav(active);
@@ -516,6 +596,7 @@
   // Workshop mode can be switched on with a link: studio/?workshop=1
   const params = new URLSearchParams(location.search);
   const startNotice = store.load();
+  setCourse(S.courseById(store.state.course) || S.COURSES[0]);
   if (params.get("workshop") === "1" && !store.state.workshop) store.setWorkshop(true);
   wireDialogs();
   window.addEventListener("hashchange", route);

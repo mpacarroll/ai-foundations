@@ -386,7 +386,8 @@
     "The rules check for the habits each lab teaches. They do not judge whether your writing is good, and a careful prompt can miss a rule because it uses words the rule does not expect.",
     "The rules can be fooled. Listing the right words will pass a check without the prompt being useful. Treat the score as a nudge, not a grade.",
     "The same input always gets the same feedback, so you can see exactly what changed between attempts.",
-    "The sample replies in each lesson were written by hand to show a point. Real AI tools will reply differently each time."
+    "The sample replies in each lesson were written by hand to show a point. Real AI tools will reply differently each time.",
+    "In the Name the failure lab, some replies could fit more than one cause. The answer key picks the main one, and the feedback explains why, so a different pick can still be a reasonable reading."
   ];
 
   return { COURSE, EVALUATION_LIMITS };

@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Foundations Studio</title>
-<meta name="description" content="Six short, guided AI labs for beginners. Learn a habit, try it, get instant feedback, revise, and save your progress. Free, offline, no sign-up.">
+<meta name="description" content="Two beginner courses of guided AI labs: writing good prompts, and handling replies that go wrong. Learn a habit, try it, get instant feedback, revise, and save your progress. Free, offline, no sign-up.">
 <link rel="canonical" href="https://mpacarroll.github.io/ai-foundations/studio/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Mick's Fair Dinkum AI">
 <meta property="og:title" content="AI Foundations Studio">
-<meta property="og:description" content="Six short, guided AI labs for beginners. Learn a habit, try it, get instant feedback, revise, and save your progress.">
+<meta property="og:description" content="Guided AI labs for beginners: write good prompts and handle replies that go wrong. Learn, try, get feedback, revise, and save your progress.">
 <meta property="og:url" content="https://mpacarroll.github.io/ai-foundations/studio/">
 <meta property="og:image" content="https://mpacarroll.github.io/ai-foundations/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -42,6 +42,7 @@
 
   <div class="layout">
     <aside class="side" aria-label="Course progress">
+      <div class="course-name" id="course-name">Your First Prompts</div>
       <div class="small muted" id="progress-label">0 of 6 labs passed</div>
       <div class="meter" aria-hidden="true"><span id="progress-bar" style="width:0%"></span></div>
       <ol class="labnav" id="labnav"></ol>
@@ -93,6 +94,8 @@
 </dialog>
 
 <script src="course.js"></script>
+<script src="course-failures.js"></script>
+<script src="catalog.js"></script>
 <script src="grader.js"></script>
 <script src="progress.js"></script>
 <script src="workshop.js"></script>

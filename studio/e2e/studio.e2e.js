@@ -190,6 +190,84 @@ async function step(name, fn) {
     assert.match(await page.locator("#board .notice").first().textContent(), /Code 7/); // line 6 is the duplicate from the step above
   });
 
+  await step("the overview lists both courses and switches to the second", async () => {
+    await page.goto(base + "#/");
+    assert.strictEqual(await page.locator(".course").count(), 2);
+    await page.locator('.course[data-course="when-ai-gets-it-wrong"]').click();
+    await page.locator("#course-name").filter({ hasText: "When AI Gets It Wrong" }).waitFor();
+    assert.strictEqual(await page.locator("#labnav li").count(), 5);
+    assert.match(await page.locator("#progress-label").textContent(), /0 of 5/);
+    await shot(page, "09-course-two");
+  });
+
+  await step("diagnose lab: a wrong first pass, then a revision that passes and names the gain", async () => {
+    await page.goto(base + "#/lab/name-the-failure/try");
+    await page.locator(".case").first().waitFor();
+    assert.strictEqual(await page.locator(".case").count(), 6);
+    await page.locator("#check").click();
+    assert.match(await page.getByRole("alert").first().textContent(), /Pick a cause/);
+    const sel = page.locator("select.cause");
+    await sel.nth(0).selectOption("invented");
+    await sel.nth(1).selectOption("invented");
+    await page.locator("#check").click();
+    await page.getByTestId("verdict").waitFor();
+    assert.match(await page.getByTestId("verdict").textContent(), /Not yet/);
+    assert.ok(await page.locator(".sent .mark", { hasText: "SKIPPED" }).count() >= 4);
+    assert.strictEqual(await page.locator(".sent .mark", { hasText: "NOT QUITE" }).count(), 1);
+    await shot(page, "10-diagnose-fail");
+    await page.getByRole("link", { name: "Revise and try again" }).click();
+    assert.strictEqual(await sel.nth(1).inputValue(), "invented", "the last attempt is kept for revising");
+    const answers = ["ignored", "invented", "vague", "outdated", "agreed", "invented"];
+    for (let i = 0; i < answers.length; i++) await sel.nth(i).selectOption(answers[i]);
+    await page.locator("#check").click();
+    await page.getByTestId("delta").waitFor();
+    assert.match(await page.getByTestId("verdict").textContent(), /Passed/);
+    assert.match(await page.getByTestId("delta").textContent(), /Up \d+ points/);
+    assert.match(await page.locator("#progress-label").textContent(), /1 of 5/);
+    await shot(page, "11-diagnose-pass");
+  });
+
+  await step("summary lab shows the original next to the sentences to check", async () => {
+    await page.goto(base + "#/lab/check-the-summary/try");
+    await page.getByTestId("source").waitFor();
+    assert.match(await page.getByTestId("source").textContent(), /front desk/);
+    for (const id of ["s2", "s5", "s7"]) await page.locator(`input[value="${id}"]`).check();
+    await page.locator("#check").click();
+    await page.getByTestId("verdict").waitFor();
+    assert.match(await page.getByTestId("verdict").textContent(), /Passed/);
+  });
+
+  await step("the second course is remembered across a reload, and results cover it", async () => {
+    await page.goto(base + "#/");
+    await page.reload();
+    await page.locator("#course-name").filter({ hasText: "When AI Gets It Wrong" }).waitFor();
+    await page.goto(base + "#/done");
+    assert.match(await page.locator("#view h2").first().textContent(), /2 of 5/);
+    await page.goto(base + "#/lab/say-what-you-want/learn");
+    await page.locator("#course-name").filter({ hasText: "Your First Prompts" }).waitFor();
+  });
+
+  await step("the workshop board switches courses and reads the same codes", async () => {
+    await page.goto(base + "#/workshop");
+    await page.locator("#workshop-course").selectOption("when-ai-gets-it-wrong");
+    await page.locator("#demo-class").click();
+    await page.getByTestId("board-count").waitFor();
+    const head = await page.locator('[data-testid="board-table"] thead th').allTextContents();
+    assert.strictEqual(head.length, 1 + 5 + 1);
+    assert.match(await page.locator('[data-testid="board-table"] caption').textContent(), /When AI Gets It Wrong/);
+    assert.match(await page.locator(".agenda").textContent(), /Name the failure/);
+    await shot(page, "12-workshop-course-two");
+    await page.locator("#workshop-course").selectOption("first-prompts");
+  });
+
+  await step("the progress code carries both courses", async () => {
+    await page.locator("#open-progress").click();
+    const code = await page.locator("#class-code").inputValue();
+    const data = await page.evaluate((c) => window.AFStudio.decodeClassCode(c), code);
+    assert.ok(data.labs["name-the-failure"] && data.labs["say-what-you-want"]);
+    await page.locator("#dlg-progress [data-close]").last().click();
+  });
+
   await step("damaged saved data is recovered with a notice", async () => {
     await page.evaluate(() => localStorage.setItem("af-studio-v1", "{broken"));
     await page.reload();
@@ -204,6 +282,12 @@ async function step(name, fn) {
     await p.locator(".cmp").first().waitFor();
     const over = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     assert.ok(over <= 0, "overflow " + over + "px");
+    for (const hash of ["#/lab/name-the-failure/try", "#/lab/check-the-summary/try", "#/"]) {
+      await p.goto(base + hash);
+      await p.locator("#view > *").first().waitFor();
+      const o = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      assert.ok(o <= 0, hash + " overflow " + o + "px");
+    }
     if (SHOTS) await p.screenshot({ path: path.join(SHOTS, "08-phone.png"), fullPage: true });
     await phone.close();
   });

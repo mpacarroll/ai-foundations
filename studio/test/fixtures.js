@@ -24,5 +24,25 @@ module.exports = {
   "fix-the-reply": {
     weak: { text: "Make it better." },
     strong: { text: "This is way too long and sounds like a greeting card. Cut it to about one minute, make it warmer and a bit funny, and fix the story: they did not meet in college, they met at a climbing gym." }
+  },
+  "name-the-failure": {
+    weak: { picks: { c1: "invented", c2: "invented", c3: "ignored", c4: "invented", c5: "vague" } },
+    strong: { picks: { c1: "ignored", c2: "invented", c3: "vague", c4: "outdated", c5: "agreed", c6: "invented" } }
+  },
+  "fix-the-generic": {
+    weak: { text: "Give me some good dinner ideas please." },
+    strong: { text: "Give me five dinner ideas for two people on weeknights. Each should take about 30 minutes. My partner does not eat dairy, and we are tired of pasta, so skip it." }
+  },
+  "ask-how-sure": {
+    weak: { text: "How much liquid can I bring on a plane?" },
+    strong: { text: "I am flying from the US to Canada next month. How much liquid can I pack in my carry-on bag? Tell me how sure you are, whether the rules may have changed recently, and which official website I can check." }
+  },
+  "check-the-summary": {
+    weak: { flags: ["s1", "s5"] },
+    strong: { flags: ["s2", "s5", "s7"] }
+  },
+  "push-back-well": {
+    weak: { choice: "A", why: "It admitted its mistake so it must be right." },
+    strong: { choice: "C", why: "It flipped just because I pushed back, so I need the actual requirements side by side and the official page to check." }
   }
 };

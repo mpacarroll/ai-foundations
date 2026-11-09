@@ -12,7 +12,7 @@
   const CODE_PREFIX = "AF1.";
 
   function emptyState() {
-    return { version: SCHEMA_VERSION, learner: "", labs: {}, drafts: {}, workshop: false };
+    return { version: SCHEMA_VERSION, learner: "", labs: {}, drafts: {}, workshop: false, course: "" };
   }
 
   function memoryStorage() {
@@ -77,6 +77,8 @@
     const s = emptyState();
     s.learner = typeof raw.learner === "string" ? raw.learner.slice(0, 60) : "";
     s.workshop = Boolean(raw.workshop);
+    // Added after v1 shipped. Optional, so older saves load unchanged and no version bump is needed.
+    s.course = typeof raw.course === "string" ? raw.course.slice(0, 60) : "";
     if (isObj(raw.drafts)) {
       for (const [k, v] of Object.entries(raw.drafts)) if (isObj(v) || typeof v === "string") s.drafts[k] = sanitizeInput(v);
     }
@@ -246,6 +248,12 @@
       return n;
     }
 
+    // Remembers which course the learner was last in.
+    function setCourse(id) {
+      state.course = String(id || "").slice(0, 60);
+      return write();
+    }
+
     function reset() {
       state = emptyState();
       const n = write();
@@ -312,6 +320,7 @@
       saveDraft,
       setLearner,
       setWorkshop,
+      setCourse,
       reset,
       exportJSON,
       importJSON,
