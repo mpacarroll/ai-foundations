@@ -1,0 +1,11 @@
+{
+  "name": "ai-foundations-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Guided AI labs with deterministic feedback. Offline, no model calls.",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "e2e": "node e2e/studio.e2e.js"
+  },
+  "license": "MIT"
+}
