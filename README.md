@@ -7,7 +7,8 @@ I'm Mick. I use AI every day and I build small tools that work. This repo is the
 ## Start here
 1. **[Start Here guide](guides/start-here.md)** — your first hour with AI, one small step at a time.
 2. **[Prompt Helper](tool/index.html)** — open it in any browser (works offline, saves nothing). Answer a few plain questions, get a good prompt to paste into any AI.
-3. **[First exercises](exercises/first-exercises.md)** — five short things to try today.
+3. **[AI Foundations Studio](studio/)**: six guided labs with instant feedback. Learn a habit, try it, revise, and your progress saves as you go. Has a workshop mode for teaching a group. [How it works](studio/README.md).
+4. **[First exercises](exercises/first-exercises.md)** — five short things to try today.
 
 ## What this is (and isn't)
 - **Is:** free, honest, beginner-first. Built for the people the AI world talks past.

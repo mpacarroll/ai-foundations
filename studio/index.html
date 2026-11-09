@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Foundations Studio</title>
+<meta name="description" content="Six short, guided AI labs for beginners. Learn a habit, try it, get instant feedback, revise, and save your progress. Free, offline, no sign-up.">
+<link rel="canonical" href="https://mpacarroll.github.io/ai-foundations/studio/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mick's Fair Dinkum AI">
+<meta property="og:title" content="AI Foundations Studio">
+<meta property="og:description" content="Six short, guided AI labs for beginners. Learn a habit, try it, get instant feedback, revise, and save your progress.">
+<meta property="og:url" content="https://mpacarroll.github.io/ai-foundations/studio/">
+<meta property="og:image" content="https://mpacarroll.github.io/ai-foundations/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><ellipse cx='16' cy='26' rx='12' ry='4.2' fill='%23d08a2c'/><ellipse cx='16' cy='18.6' rx='8.6' ry='3.8' fill='%23cfc8b8'/><ellipse cx='15.4' cy='12' rx='5.6' ry='3.1' fill='%23d08a2c'/><ellipse cx='16.2' cy='6.6' rx='3.2' ry='2.3' fill='%232e8c5c'/></svg>">
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+<header class="mc-top"><div class="wrap mc-bar">
+  <a class="mc-mark" href="https://mpacarroll.github.io/ai-mick/" aria-label="Mick Cairn, all free tools">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="26" rx="12" ry="4.2" fill="#d08a2c"/><ellipse cx="16" cy="18.6" rx="8.6" ry="3.8" fill="#cfc8b8"/><ellipse cx="15.4" cy="12" rx="5.6" ry="3.1" fill="#d08a2c"/><ellipse cx="16.2" cy="6.6" rx="3.2" ry="2.3" fill="#2e8c5c"/></svg>
+    <span><b>Mick Cairn</b><small>Free tools</small></span>
+  </a>
+  <a class="mc-all" href="../">AI Foundations home</a>
+</div></header>
+
+<div class="wrap">
+  <div class="intro">
+    <div>
+      <span class="tag">Guided labs</span>
+      <h1>AI Foundations Studio</h1>
+      <p class="lede">Learn one habit, try it, get instant feedback, and revise until it clicks. Works offline. Nothing you type leaves this device.</p>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="btn ghost small" id="open-limits">How the feedback works</button>
+      <button type="button" class="btn ghost small" id="open-progress">Save or move my progress</button>
+      <button type="button" class="btn ghost small" id="toggle-workshop" aria-pressed="false">Workshop mode</button>
+    </div>
+  </div>
+  <div id="notice" class="notice" role="status" hidden></div>
+
+  <div class="layout">
+    <aside class="side" aria-label="Course progress">
+      <div class="small muted" id="progress-label">0 of 6 labs passed</div>
+      <div class="meter" aria-hidden="true"><span id="progress-bar" style="width:0%"></span></div>
+      <ol class="labnav" id="labnav"></ol>
+      <div class="sidelinks">
+        <a href="#/">Course overview</a>
+        <a href="#/done">My results</a>
+        <a href="#/workshop" id="workshop-link" hidden>Workshop board</a>
+      </div>
+    </aside>
+    <main id="view" tabindex="-1" aria-live="polite"></main>
+  </div>
+
+  <footer>
+    New to this? Read <a href="../guides/start-here.md">Start Here</a> or try the <a href="../tool/">Prompt Helper</a>.
+    Made by Mick. Free and open source under the MIT license.
+  </footer>
+</div>
+
+<dialog id="dlg-limits" aria-labelledby="limits-title">
+  <div class="dlg">
+    <h2 id="limits-title">How the feedback works</h2>
+    <ul id="limits-list"></ul>
+    <div class="actions"><button type="button" class="btn" data-close>Got it</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlg-progress" aria-labelledby="progress-title">
+  <div class="dlg">
+    <h2 id="progress-title">Save or move my progress</h2>
+    <p class="muted small" id="persist-line"></p>
+    <label for="learner-name">Your first name <span class="muted small">(optional, shown to your instructor)</span></label>
+    <input type="text" id="learner-name" maxlength="60" autocomplete="given-name">
+    <h3>Share with an instructor</h3>
+    <p class="small muted">This code holds your scores and which checks you missed. It never includes what you typed.</p>
+    <div class="codebox"><input type="text" id="class-code" readonly aria-label="Your progress code"><button type="button" class="btn small" id="copy-code">Copy code</button></div>
+    <h3>Move to another browser</h3>
+    <p class="small muted">The file includes your attempts, so you can keep revising elsewhere.</p>
+    <div class="actions" style="margin-top:6px">
+      <button type="button" class="btn small" id="export-file">Download progress file</button>
+      <label class="btn ghost small" style="margin:0">Import a progress file<input type="file" id="import-file" accept="application/json,.json" hidden></label>
+    </div>
+    <p id="import-msg" class="small" role="status"></p>
+    <h3>Start over</h3>
+    <div class="actions" style="margin-top:6px">
+      <button type="button" class="btn ghost small warn" id="reset-all">Clear all progress on this device</button>
+      <button type="button" class="btn" data-close>Done</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="course.js"></script>
+<script src="grader.js"></script>
+<script src="progress.js"></script>
+<script src="workshop.js"></script>
+<script src="demo-class.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
