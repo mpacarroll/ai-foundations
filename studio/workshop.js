@@ -25,10 +25,17 @@
   }
 
   // Parses pasted codes (one per line, or separated by spaces). Bad lines are reported, not fatal.
+  // The same code pasted twice is counted once, so a learner who sends it twice does not skew the board.
   function parseCodes(text, decode) {
     const parts = String(text || "").split(/\s+/).map((s) => s.trim()).filter(Boolean);
     const learners = [], errors = [];
+    const seen = new Map();
     parts.forEach((p, i) => {
+      if (seen.has(p)) {
+        errors.push({ index: i + 1, duplicate: true, message: "Same code as code " + seen.get(p) + ", counted once." });
+        return;
+      }
+      seen.set(p, i + 1);
       try {
         learners.push(decode(p));
       } catch (e) {

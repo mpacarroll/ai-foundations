@@ -40,6 +40,24 @@
     return v != null && typeof v === "object" && !Array.isArray(v);
   }
 
+  // An attempt's input has one of three shapes: { text }, { choice, why }, or { flags }.
+  // Imported files are untrusted, so keep only those fields with the right types.
+  function sanitizeInput(v) {
+    if (typeof v === "string") return { text: v.slice(0, 20000) };
+    if (!isObj(v)) return { text: "" };
+    const out = {};
+    if (typeof v.text === "string") out.text = v.text.slice(0, 20000);
+    if (typeof v.choice === "string") out.choice = v.choice.slice(0, 20);
+    if (typeof v.why === "string") out.why = v.why.slice(0, 5000);
+    if (Array.isArray(v.flags)) out.flags = v.flags.filter((x) => typeof x === "string").slice(0, 100);
+    if (isObj(v.picks)) {
+      out.picks = {};
+      for (const [k, val] of Object.entries(v.picks)) if (typeof val === "string") out.picks[k.slice(0, 40)] = val.slice(0, 40);
+    }
+    if (!Object.keys(out).length) out.text = "";
+    return out;
+  }
+
   // Keep only well-formed fields. Anything unexpected is dropped rather than trusted.
   function sanitizeAttempt(a) {
     if (!isObj(a) || typeof a.at !== "string" || typeof a.score !== "number") return null;
@@ -47,7 +65,7 @@
       at: a.at,
       score: Math.max(0, Math.min(100, Math.round(a.score))),
       passed: Boolean(a.passed),
-      input: isObj(a.input) ? a.input : { text: String(a.input == null ? "" : a.input) },
+      input: sanitizeInput(a.input),
       met: Array.isArray(a.met) ? a.met.filter((x) => typeof x === "string") : [],
       missed: Array.isArray(a.missed) ? a.missed.filter((x) => typeof x === "string") : []
     };
@@ -60,7 +78,7 @@
     s.learner = typeof raw.learner === "string" ? raw.learner.slice(0, 60) : "";
     s.workshop = Boolean(raw.workshop);
     if (isObj(raw.drafts)) {
-      for (const [k, v] of Object.entries(raw.drafts)) if (isObj(v) || typeof v === "string") s.drafts[k] = v;
+      for (const [k, v] of Object.entries(raw.drafts)) if (isObj(v) || typeof v === "string") s.drafts[k] = sanitizeInput(v);
     }
     if (isObj(raw.labs)) {
       for (const [id, lab] of Object.entries(raw.labs)) {
@@ -114,8 +132,8 @@
     for (const [id, l] of Object.entries(data.labs)) {
       if (!isObj(l)) continue;
       out.labs[id] = {
-        best: Math.max(0, Math.min(100, Number(l.b) || 0)),
-        attempts: Math.max(0, Number(l.a) || 0),
+        best: Number.isFinite(Number(l.b)) ? Math.max(0, Math.min(100, Math.round(Number(l.b)))) : 0,
+        attempts: Number.isFinite(Number(l.a)) ? Math.max(0, Math.min(999, Math.round(Number(l.a)))) : 0,
         passed: Boolean(l.p),
         missed: Array.isArray(l.m) ? l.m.filter((x) => typeof x === "string") : []
       };
@@ -302,5 +320,5 @@
     };
   }
 
-  return { createStore, encodeClassCode, decodeClassCode, summarizeLab, memoryStorage, SCHEMA_VERSION, MAX_ATTEMPTS };
+  return { createStore, sanitizeInput, encodeClassCode, decodeClassCode, summarizeLab, memoryStorage, SCHEMA_VERSION, MAX_ATTEMPTS };
 });

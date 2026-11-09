@@ -98,6 +98,13 @@ async function step(name, fn) {
     assert.strictEqual(await page.locator('#labnav a[data-status="passed"]').count(), 1);
   });
 
+  await step("a draft typed just before leaving the page is kept", async () => {
+    await page.locator("#attempt").fill("Explain password managers to my uncle, quickly");
+    await page.goto(base + "#/lab/who-its-for/learn"); // well inside the 400 ms autosave delay
+    await page.goto(base + "#/lab/who-its-for/try");
+    assert.strictEqual(await page.locator("#attempt").inputValue(), "Explain password managers to my uncle, quickly");
+  });
+
   await step("empty attempts are refused with a clear message", async () => {
     await page.locator("#attempt").fill("  ");
     await page.locator("#check").click();
@@ -158,10 +165,29 @@ async function step(name, fn) {
     await shot(page, "07-workshop-board");
   });
 
+  await step("the lab timer keeps ticking on screen after leaving and coming back", async () => {
+    await page.getByRole("button", { name: "Start" }).click();
+    await page.goto(base + "#/");
+    await page.goto(base + "#/workshop");
+    const a = await page.getByTestId("timer").textContent();
+    await page.waitForTimeout(2200);
+    const b = await page.getByTestId("timer").textContent();
+    assert.notStrictEqual(a, b, "clock froze at " + a);
+    await page.getByRole("button", { name: "Pause" }).click();
+  });
+
+  await step("a code pasted twice is counted once", async () => {
+    const first = (await page.locator("#codes").inputValue()).split("\n")[0];
+    await page.locator("#codes").fill((await page.locator("#codes").inputValue()) + "\n" + first);
+    await page.locator("#build-board").click();
+    assert.match(await page.getByTestId("board-count").textContent(), /5 learners/);
+    assert.match(await page.getByTestId("dupes").textContent(), /counted once/);
+  });
+
   await step("bad codes are reported without breaking the board", async () => {
     await page.locator("#codes").fill((await page.locator("#codes").inputValue()) + "\nnonsense");
     await page.locator("#build-board").click();
-    assert.match(await page.locator("#board .notice").first().textContent(), /Code 6/);
+    assert.match(await page.locator("#board .notice").first().textContent(), /Code 7/); // line 6 is the duplicate from the step above
   });
 
   await step("damaged saved data is recovered with a notice", async () => {

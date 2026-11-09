@@ -172,6 +172,11 @@
   }
 
   let draftTimer = null;
+  let pendingDraft = null; // saves the draft now; set while a save is queued
+  function flushDraft() {
+    clearTimeout(draftTimer);
+    if (pendingDraft) { const f = pendingDraft; pendingDraft = null; f(); }
+  }
   function renderTry(lab) {
     const a = lab.attempt;
     const start = startingInput(lab);
@@ -179,10 +184,11 @@
     let readInput;
     const queueDraft = () => {
       clearTimeout(draftTimer);
-      draftTimer = setTimeout(() => {
+      pendingDraft = () => {
         const note = store.saveDraft(lab.id, readInput());
         savedLine.textContent = note || (store.persistent ? "Draft saved" : "Draft kept for this visit");
-      }, 400);
+      };
+      draftTimer = setTimeout(flushDraft, 400);
     };
     let field;
     if (lab.type === "choice") {
@@ -214,6 +220,7 @@
       const result = S.grade(lab, input);
       if (result.empty) { err.textContent = result.summary; return; }
       clearTimeout(draftTimer);
+      pendingDraft = null;
       const note = store.recordAttempt(lab.id, input, result);
       if (note) showNotice(note);
       go("#/lab/" + lab.id + "/feedback");
@@ -325,7 +332,7 @@
   }
 
   // ---------- workshop ----------
-  const timer = { labId: LABS[0].id, remaining: LABS[0].facilitator.minutes * 60, running: false, handle: null };
+  const timer = { labId: LABS[0].id, remaining: LABS[0].facilitator.minutes * 60, running: false, handle: null, paint: () => {} };
   let boardText = "";
 
   function renderWorkshop() {
@@ -337,12 +344,13 @@
       clock.textContent = (timer.remaining < 0 ? "+" : "") + m + ":" + String(s).padStart(2, "0");
       clock.classList.toggle("over", timer.remaining < 0);
     };
+    timer.paint = paint; // the running interval always repaints the clock currently on screen
     const startBtn = h("button", { type: "button", class: "btn small" }, timer.running ? "Pause" : "Start");
     startBtn.addEventListener("click", () => {
       timer.running = !timer.running;
       startBtn.textContent = timer.running ? "Pause" : "Start";
       clearInterval(timer.handle);
-      if (timer.running) timer.handle = setInterval(() => { timer.remaining--; paint(); }, 1000);
+      if (timer.running) timer.handle = setInterval(() => { timer.remaining--; timer.paint(); }, 1000);
     });
     const select = h("select", { "aria-label": "Lab to time", style: "padding:8px;border-radius:6px;border:1.5px solid var(--line);background:var(--stone);color:var(--ink);font:inherit",
       onchange: (e) => { timer.labId = e.target.value; timer.remaining = labById(timer.labId).facilitator.minutes * 60; paint(); } },
@@ -387,7 +395,9 @@
   function renderBoard(text) {
     const { learners, errors } = S.parseCodes(text, S.decodeClassCode);
     const out = [];
-    if (errors.length) out.push(h("p", { class: "notice", role: "alert" }, errors.map((e) => "Code " + e.index + ": " + e.message).join(" ")));
+    const bad = errors.filter((e) => !e.duplicate), dupes = errors.filter((e) => e.duplicate);
+    if (bad.length) out.push(h("p", { class: "notice", role: "alert" }, bad.map((e) => "Code " + e.index + ": " + e.message).join(" ")));
+    if (dupes.length) out.push(h("p", { class: "small muted", "data-testid": "dupes" }, dupes.map((e) => "Code " + e.index + ": " + e.message).join(" ")));
     if (!learners.length) { out.push(h("p", { class: "muted" }, "No codes yet. Paste some, or load the demo class to see how the board works.")); return h("div", {}, out); }
     const agg = S.aggregateClass(COURSE, learners);
     out.push(h("p", { "data-testid": "board-count" }, agg.learnerCount + " learner" + (agg.learnerCount === 1 ? "" : "s") + " on the board."));
@@ -487,7 +497,7 @@
   }
 
   function route() {
-    clearTimeout(draftTimer);
+    flushDraft(); // leaving the page within the autosave delay must not lose the last keystrokes
     const parts = location.hash.replace(/^#\/?/, "").split("/");
     let active = null;
     if (parts[0] === "lab" && labById(parts[1])) {

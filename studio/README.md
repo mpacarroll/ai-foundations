@@ -64,8 +64,8 @@ Turn it on with the Workshop mode button or the link `studio/?workshop=1`.
 
 ```sh
 cd studio
-npm test        # 33 unit tests: course integrity and house style, grading, persistence, workshop board
-npm run e2e     # 15 browser checks in Chromium via Playwright; SHOTS=/some/dir saves screenshots
+npm test        # 36 unit tests: course integrity and house style, grading, persistence, workshop board
+npm run e2e     # 18 browser checks in Chromium via Playwright; SHOTS=/some/dir saves screenshots
 ```
 
 The e2e script starts its own static server, walks a full learn, fail, revise, pass loop, checks reload persistence, draft autosave, every exercise type, export and re-import, workshop board with the demo class, damaged-data recovery, phone width overflow, and that the page makes no network requests and logs no errors. It needs Playwright and Chromium available to `require("playwright")`.

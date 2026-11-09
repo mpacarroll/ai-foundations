@@ -40,3 +40,13 @@ test("an empty class gives an empty board, not an error", () => {
   assert.strictEqual(board.focus, null);
   assert.ok(board.labs.every((l) => l.averageBest === null));
 });
+
+test("the same code pasted twice counts once and is reported as a duplicate", () => {
+  const code = encodeClassCode(DEMO_CLASS[0]);
+  const { learners, errors } = W.parseCodes(code + "\n" + encodeClassCode(DEMO_CLASS[1]) + "\n" + code, decodeClassCode);
+  assert.strictEqual(learners.length, 2);
+  assert.strictEqual(errors.length, 1);
+  assert.ok(errors[0].duplicate);
+  assert.strictEqual(errors[0].index, 3);
+  assert.match(errors[0].message, /code 1/);
+});

@@ -154,3 +154,22 @@ test("decodeClassCode explains bad input", () => {
   assert.throws(() => P.decodeClassCode("hello"), /start with AF1/);
   assert.throws(() => P.decodeClassCode("AF1.%%%%"), /damaged/);
 });
+
+test("imported inputs are reduced to known fields with the right types", () => {
+  const { sanitizeInput } = require("../progress.js");
+  assert.deepStrictEqual(sanitizeInput({ flags: "abc" }), { text: "" });
+  assert.deepStrictEqual(sanitizeInput({ flags: ["s1", 7, "s3"], evil: "<img>" }), { flags: ["s1", "s3"] });
+  assert.deepStrictEqual(sanitizeInput({ text: { nested: 1 } }), { text: "" });
+  assert.deepStrictEqual(sanitizeInput({ choice: "C", why: "because" }), { choice: "C", why: "because" });
+  assert.deepStrictEqual(sanitizeInput("plain"), { text: "plain" });
+  assert.deepStrictEqual(sanitizeInput(null), { text: "" });
+});
+
+test("tampered progress codes cannot show impossible numbers", () => {
+  const { encodeClassCode, decodeClassCode } = require("../progress.js");
+  const d = decodeClassCode(encodeClassCode({ n: "X", labs: { a: { b: 1e999, a: 1e999, p: 1, m: [] }, c: { b: "NaN", a: -4, p: 0, m: [] } } }));
+  assert.strictEqual(d.labs.a.attempts, 0);
+  assert.strictEqual(d.labs.a.best, 0);
+  assert.strictEqual(d.labs.c.attempts, 0);
+  assert.strictEqual(d.labs.c.best, 0);
+});
